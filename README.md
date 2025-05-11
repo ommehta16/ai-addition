@@ -30,3 +30,5 @@ Other than those, you only need `os`, `sys`, `json`, and `datetime`.
 - idk it's funny
 - "education"
 - lowk just wanted to do this to figure out who AI is 🤷‍♂️
+
+(this could probably just be a gist lol)
