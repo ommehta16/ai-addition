@@ -1,32 +1,32 @@
 if __name__ == "__main__": print("loading...")
 
 import numpy as np
-import os, sys, random, json, datetime
+import os, sys, json, datetime
 
 N = 500 # number of agents
 T = 500 # number of testcases for each agent
 G = 100 # number of generations
-L = 4 # number of layers
-SURVIVE_RATIO = 20 # 1/SURVIVE_RATIO of the population survives after each generation
+STRUCTURE = [2,3,4,1] # number of values for each layer of the network
+SURVIVE_RATIO = 20 # 1/SURVIVE_RATIO of the population survives after each gen
 
+L = len(STRUCTURE)
 assert SURVIVE_RATIO % L == 0 # I'm too lazy to implement variated reproduction
 
 training_storage = "training"
 
-structure = [2,3,4,1]
 
 brains:list[list[np.ndarray]] = [ [[]] for _ in range(N) ]
 
 for b in range(N):
     brain:list[np.ndarray] = [ [] for _ in range(L-1) ]
     for i in range(L-1):
-        brain[i] = np.random.random((structure[i],structure[i+1])).astype(float)
+        brain[i] = np.random.random((STRUCTURE[i],STRUCTURE[i+1])).astype(float)
     
     brains[b] = brain
 
 def solve(brain:list[np.ndarray],*inp:float) -> list:
     layers:list[list[float]] = [
-        [0.0 for _ in range(structure[i])] for i in range(L)
+        [0.0 for _ in range(STRUCTURE[i])] for i in range(L)
     ]
 
 
@@ -34,14 +34,14 @@ def solve(brain:list[np.ndarray],*inp:float) -> list:
     layers[0] = list(inp)
     for l in range(0,L-1):
         # print(f"{l} -> {brain[l]}")
-        for i in range(structure[l+1]):
-            for j in range(structure[l]):
+        for i in range(STRUCTURE[l+1]):
+            for j in range(STRUCTURE[l]):
                 
                 layers[l+1][i] += brain[l][j,i] * layers[l][j]
 
     return layers[-1]
 
-TCS = [[random.randint(0,1000),random.randint(0,1000)] for _ in range(T)]
+TCS = [[np.random.randint(0,1000),np.random.randint(0,1000)] for _ in range(T)]
 
 prev_best = []
 
@@ -75,8 +75,8 @@ def evolve(gen:int):
             child = parent.copy()
 
             for l in range(len(child)):
-                STRENGTH = max(1,5/gen) * 0.1 # how random it is -- small kickstart (doesn't do much though :/ )
-                child[l] = child[l] + STRENGTH*np.random.random_sample(child[l].shape) - STRENGTH/2
+                STRENGTH = max(1,5/gen) * 0.1 # how much randomness we add
+                child[l] += STRENGTH*np.random.random_sample(child[l].shape) - STRENGTH/2
 
                 child[l] = np.clip(child[l],-2.0,2.0)
             mutated.append(child)
