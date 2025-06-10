@@ -43,10 +43,8 @@ def solve(brain:list[np.ndarray],*inp:float) -> list:
 
 TCS = [[np.random.randint(0,1000),np.random.randint(0,1000)] for _ in range(T)]
 
-prev_best = []
-
 def evolve(gen:int):
-    global brains, prev_best
+    global brains
 
     error_marked = []
     m_err = 1e18
